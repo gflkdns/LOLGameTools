@@ -3,8 +3,6 @@ import PyHook3
 import threading
 import time
 import wx
-import getopt
-import sys
 from ctypes import POINTER, c_ulong, Structure, c_ushort, c_short, c_long, byref, windll, pointer, sizeof, Union
 
 # ---------------------------------------------
@@ -114,24 +112,30 @@ class MainWindow(wx.Frame):
     leftPass = False
     # 是否只以英雄为目标 c
     onlyLoL = True
+    currentKey = "Space"
 
     def onKeyDown(self, event):
+        if self.start_setting:
+            self.currentKey = event.Key
+            self.start_setting = False
+            self.message_text.Label = "已绑定到：[" + self.currentKey + "]按下走A"
+            return True
         # print(event.Key, 'down')
-        if (event.Key == "Lshift" or event.Key == "T"):
+        if event.Key == self.currentKey:
             self.leftPass = True
-        elif (event.Key == "Up"):
+        elif event.Key == "Up":
             self.updateNum(self.text_num1, True, 0.1, 3.0, 0.1)
-        elif (event.Key == "Down"):
+        elif event.Key == "Down":
             self.updateNum(self.text_num1, False, 0.1, 3.0, 0.1)
-        elif (event.Key == "Right"):
+        elif event.Key == "Right":
             self.updateNum(self.text_num2, True, 0.1, 0.9, 0.05)
-        elif (event.Key == "Left"):
+        elif event.Key == "Left":
             self.updateNum(self.text_num2, False, 0.1, 0.9, 0.05)
         return True
 
     def onKeyUp(self, event):
         # print(event.Key, 'up')
-        if (event.Key == "Lshift" or event.Key == "T"):
+        if event.Key == self.currentKey:
             self.leftPass = False
 
         return True
@@ -203,9 +207,11 @@ class MainWindow(wx.Frame):
         wx.Frame.__init__(self, parent, title=title, style=wx.DEFAULT_FRAME_STYLE ^ (
                 wx.MAXIMIZE_BOX | wx.RESIZE_BORDER | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW,
                           size=(170, 180))
-        self.SetTransparent(180)  # 设置透明
+        # self.SetTransparent(255)  # 设置透明
+        self.SetBackgroundColour("#ffffff")
 
         self.isPause = True
+        self.start_setting = False
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.sizer1 = wx.BoxSizer(wx.HORIZONTAL)
@@ -218,56 +224,59 @@ class MainWindow(wx.Frame):
         self.text_num1 = wx.StaticText(self, name="aa", label="0.7", size=(30, -1), style=wx.ALIGN_CENTER)
         self.text1.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL))
         self.text_num1.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD))
-        self.text1.SetForegroundColour('yellow')
-        self.text_num1.SetForegroundColour('yellow')
-        self.button_up1 = wx.Button(self, name="up1", label="+", size=(30, 30))
-        self.button_down1 = wx.Button(self, name="down1", label="-", size=(30, 30))
+        self.text1.SetForegroundColour('#000000')
+        self.text_num1.SetForegroundColour('#000000')
+        self.button_up1 = wx.Button(self, name="up1", label="↑", size=(30, 30))
+        self.button_down1 = wx.Button(self, name="down1", label="↓", size=(30, 30))
         self.Bind(wx.EVT_BUTTON, self.onClick, self.button_up1)
         self.Bind(wx.EVT_BUTTON, self.onClick, self.button_down1)
         self.sizer1.Add(self.text1, flag=wx.ALIGN_CENTER)
         self.sizer1.Add(self.text_num1, flag=wx.ALIGN_CENTER)
-        self.sizer1.Add(self.button_up1, flag=wx.ALIGN_CENTER)
         self.sizer1.Add(self.button_down1, flag=wx.ALIGN_CENTER)
+        self.sizer1.Add(self.button_up1, flag=wx.ALIGN_CENTER)
 
-        self.text2 = wx.StaticText(self, name="aa", label="前摇间隔", size=(70, -1), style=wx.ALIGN_CENTER)
+        self.text2 = wx.StaticText(self, name="aa", label="前摇比例", size=(70, -1), style=wx.ALIGN_CENTER)
         self.text_num2 = wx.StaticText(self, name="aa", label="0.3", size=(30, -1), style=wx.ALIGN_CENTER)
         self.text2.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL))
         self.text_num2.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD))
-        self.text2.SetForegroundColour('yellow')
-        self.text_num2.SetForegroundColour('yellow')
-        self.button_up2 = wx.Button(self, name="up2", label="+", size=(30, 30))
-        self.button_down2 = wx.Button(self, name="down2", label="-", size=(30, 30))
+        self.text2.SetForegroundColour('#000000')
+        self.text_num2.SetForegroundColour('#000000')
+        self.button_up2 = wx.Button(self, name="up2", label="→", size=(30, 30))
+        self.button_down2 = wx.Button(self, name="down2", label="←", size=(30, 30))
         self.Bind(wx.EVT_BUTTON, self.onClick, self.button_up2)
         self.Bind(wx.EVT_BUTTON, self.onClick, self.button_down2)
         self.sizer2.Add(self.text2, flag=wx.ALIGN_CENTER)
         self.sizer2.Add(self.text_num2, flag=wx.ALIGN_CENTER)
-        self.sizer2.Add(self.button_up2, flag=wx.ALIGN_CENTER)
         self.sizer2.Add(self.button_down2, flag=wx.ALIGN_CENTER)
+        self.sizer2.Add(self.button_up2, flag=wx.ALIGN_CENTER)
 
         self.text3 = wx.StaticText(self, name="aa", label="移动补偿", size=(70, -1), style=wx.ALIGN_CENTER)
         self.text_num3 = wx.StaticText(self, name="aa", label="0.0", size=(30, -1), style=wx.ALIGN_CENTER)
         self.text3.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL))
         self.text_num3.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD))
-        self.text3.SetForegroundColour('yellow')
-        self.text_num3.SetForegroundColour('yellow')
+        self.text3.SetForegroundColour('#000000')
+        self.text_num3.SetForegroundColour('#000000')
         self.button_up3 = wx.Button(self, name="up3", label="+", size=(30, 30))
         self.button_down3 = wx.Button(self, name="down3", label="-", size=(30, 30))
         self.Bind(wx.EVT_BUTTON, self.onClick, self.button_up3)
         self.Bind(wx.EVT_BUTTON, self.onClick, self.button_down3)
         self.sizer3.Add(self.text3, flag=wx.ALIGN_CENTER)
         self.sizer3.Add(self.text_num3, flag=wx.ALIGN_CENTER)
-        self.sizer3.Add(self.button_up3, flag=wx.ALIGN_CENTER)
         self.sizer3.Add(self.button_down3, flag=wx.ALIGN_CENTER)
+        self.sizer3.Add(self.button_up3, flag=wx.ALIGN_CENTER)
 
-        self.button_start = wx.Button(self, name="start", label="启动", size=(80, 30))
-        self.button_stop = wx.Button(self, name="stop", label="关闭", size=(80, 30))
+        self.button_start = wx.Button(self, name="start", label="开", size=(40, 30))
+        self.button_stop = wx.Button(self, name="stop", label="关", size=(40, 30))
+        self.button_setting = wx.Button(self, name="setting", label="设触发键", size=(80, 30))
         self.Bind(wx.EVT_BUTTON, self.onClick, self.button_start)
         self.Bind(wx.EVT_BUTTON, self.onClick, self.button_stop)
+        self.Bind(wx.EVT_BUTTON, self.onClick, self.button_setting)
         self.sizer4.Add(self.button_start, flag=wx.ALIGN_CENTER)
         self.sizer4.Add(self.button_stop, flag=wx.ALIGN_CENTER)
+        self.sizer4.Add(self.button_setting, flag=wx.ALIGN_CENTER)
 
         self.message_text = wx.StaticText(self, name="aa", label="作者:github.com/miqt")
-        self.message_text.SetForegroundColour('yellow')
+        self.message_text.SetForegroundColour('#000000')
         self.sizer5.Add(self.message_text)
 
         self.sizer.Add(self.sizer1)
@@ -302,11 +311,16 @@ class MainWindow(wx.Frame):
             self.updateNum(self.text_num3, False, 0.0, 3.0, 0.1)
         elif name == "start":
             self.isPause = False
-            self.message_text.Label = "已启动,按住Shift或T走A"
+            self.SetTransparent(255)  # 设置透明
+            self.message_text.Label = "已启动,按住["+self.currentKey+"]走A"
             pass
         elif name == "stop":
             self.isPause = True
-            self.message_text.Label = "已关闭,按住Shift或T走A"
+            self.SetTransparent(90)  # 设置透明
+            self.message_text.Label = "已关闭,按住["+self.currentKey+"]走A"
+        elif name == "setting":
+            self.start_setting = True
+            self.message_text.Label = "按任意键完成绑定"
             pass
 
     def updateNum(self, who, isUp, min, max, min_diff):
