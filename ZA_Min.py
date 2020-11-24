@@ -94,15 +94,17 @@ def sendkey(scancode, pressed):
 
 
 class MainWindow(wx.Frame):
-    minTime = 0.06
+    minTime = 0.05
     press_the_trigger_button = False
     onlyLoL = True
     currentKey = "Capital"
-    GongSu = 1.8
-    QianYao = 0.44
+    GongSu = 0.6
+    QianYao = 0.3
+    dc = 1.0 / GongSu
+    qy = dc * QianYao
+    hy = dc - qy
 
     def onKeyDown(self, event):
-        print(event.Key)
         if event.Key == self.currentKey:
             self.press_the_trigger_button = True
             if self.onlyLoL and self.press_the_trigger_button and not self.isPause:
@@ -150,21 +152,25 @@ class MainWindow(wx.Frame):
     def action(self):
         while True:
             if self.press_the_trigger_button and not self.isPause:
-                process_time = time.time()
-                self.click(0x2c, (1.0 / self.GongSu) * self.QianYao)
-                self.click(0x2d, (1.0 / self.GongSu) - (time.time() - process_time))
+                # process_time = time.time()
+                self.click(0x2c, self.qy)
+                self.click(0x2d, self.hy)
+                # ys = time.time() - process_time - self.dc
+                # print('单次攻击时间:', round(self.dc, 3), '前摇', round(self.qy, 3), '后摇', round(self.hy, 3), '摇损', ys * 1000)
             else:
-                time.sleep(0.05)
+                time.sleep(0.01)
 
     def click(self, key, click_time):
         while click_time > self.minTime and self.press_the_trigger_button:
+            process_time = time.time()
             sendkey(key, 1)
             sendkey(key, 0)
             time.sleep(self.minTime)
-            click_time = click_time - self.minTime
-        sendkey(key, 1)
-        sendkey(key, 0)
-        time.sleep(click_time)
+            click_time = click_time - (time.time() - process_time)
+        if self.press_the_trigger_button:
+            sendkey(key, 1)
+            sendkey(key, 0)
+            time.sleep(click_time)
 
     def key_listener(self, ):
         hm = PyHook3.HookManager()
@@ -234,6 +240,9 @@ class MainWindow(wx.Frame):
             self.GongSu = num
         elif who == self.text_num2:
             self.QianYao = num
+        self.dc = 1.0 / self.GongSu
+        self.qy = self.dc * self.QianYao
+        self.hy = self.dc - self.qy
         num = str(num)
         if len(num) > 3:
             num = num[0:4]
