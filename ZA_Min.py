@@ -171,7 +171,7 @@ class MainWindow(wx.Frame):
             sendkey(key, 0)
             time.sleep(self.minTime)
             click_time = click_time - (time.time() - process_time)
-        if self.press_the_trigger_button:
+        if self.press_the_trigger_button and click_time > 0:
             sendkey(key, 1)
             sendkey(key, 0)
             time.sleep(click_time)
@@ -185,8 +185,8 @@ class MainWindow(wx.Frame):
 
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, pos=(500, 500), style=wx.DEFAULT_FRAME_STYLE ^ (
-                wx.MAXIMIZE_BOX |  wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW,
-                          size=(45, 65))
+                wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW,
+                          size=(55, 75))
                           # size=(70, 70))
 
         self.SetBackgroundColour("#ffffff")
