@@ -98,8 +98,8 @@ class MainWindow(wx.Frame):
     press_the_trigger_button = False
     onlyLoL = True
     currentKey = "Capital"
-    GongSu = 0.6
-    QianYao = 0.3
+    GongSu = 1.8
+    QianYao = 0.45
     dc = 1.0 / GongSu
     qy = dc * QianYao
     hy = dc - qy
@@ -107,21 +107,25 @@ class MainWindow(wx.Frame):
     def onKeyDown(self, event):
         if event.Key == self.currentKey:
             self.press_the_trigger_button = True
-            if self.onlyLoL and self.press_the_trigger_button and not self.isPause:
+            if self.onlyLoL and not self.isPause:
                 # 按下 C 显示攻击距离,并且仅选中英雄
                 sendkey(0x2e, 1)
             return self.isPause
         elif event.Key == "Up":
             self.update_number(self.text_num1, True, 0.6, 3.0, 0.02)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
             return False
         elif event.Key == "Down":
             self.update_number(self.text_num1, False, 0.6, 3.0, 0.02)
             return False
         elif event.Key == "Right":
-            self.update_number(self.text_num2, True, 0, 1, 0.02)
+            self.update_number(self.text_num2, True, 0, 1, 0.01)
             return False
         elif event.Key == "Left":
-            self.update_number(self.text_num2, False, 0, 1, 0.02)
+            self.update_number(self.text_num2, False, 0, 1, 0.01)
             return False
         elif event.Key == "Prior":
             self.isPause = False
@@ -180,10 +184,10 @@ class MainWindow(wx.Frame):
         pythoncom.PumpMessages()
 
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, style=wx.DEFAULT_FRAME_STYLE ^ (
-                wx.MAXIMIZE_BOX | wx.RESIZE_BORDER | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW,
-                          # size=(45, 65))
-                          size=(70, 70))
+        wx.Frame.__init__(self, parent, title=title, pos=(500, 500), style=wx.DEFAULT_FRAME_STYLE ^ (
+                wx.MAXIMIZE_BOX |  wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW,
+                          size=(45, 65))
+                          # size=(70, 70))
 
         self.SetBackgroundColour("#ffffff")
 
@@ -201,14 +205,14 @@ class MainWindow(wx.Frame):
 
         self.text_num1.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD))
 
-        self.text_num1.SetForegroundColour('#000000')
+        self.text_num1.SetForegroundColour('#FF0000')
         self.sizer1.Add(self.text_num1, flag=wx.ALIGN_CENTER)
 
         self.text_num2 = wx.StaticText(self, name="aa", label=str(self.QianYao), size=(-1, -1), style=wx.ALIGN_CENTER)
 
         self.text_num2.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD))
 
-        self.text_num2.SetForegroundColour('#000000')
+        self.text_num2.SetForegroundColour('#0000FF')
 
         self.sizer2.Add(self.text_num2, flag=wx.ALIGN_CENTER)
 
