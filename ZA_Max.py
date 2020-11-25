@@ -195,8 +195,8 @@ class MainWindow(wx.Frame):
                 self.click(0x2c, self.qy)
                 self.click(0x2d, self.hy)
                 ys = time.time() - process_time - self.dc - self.YDBC
-                self.message_text.Label = (str(round(self.dc, 3)) + '/' + str(round(self.qy, 3)) + '/' +
-                                           str(round(self.hy, 3)) + '/' + str(round(ys, 3)))
+                self.message_text.Label = (str(round(self.dc, 3)) + 'A/' + str(round(self.qy, 3)) + 'Z/' +
+                                           str(round(self.hy, 3)) + 'X/' + str(round(ys, 3)))
             else:
                 time.sleep(0.01)
 

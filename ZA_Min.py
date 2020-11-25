@@ -114,54 +114,54 @@ class MainWindow(wx.Frame):
         elif event.Key == "Up":
             self.update_number(self.text_num1, True, 0.6, 3.0, 0.1)
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP )
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) )
             return False
         elif event.Key == "Down":
             self.update_number(self.text_num1, False, 0.6, 3.0, 0.1)
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP )
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) )
             return False
         elif event.Key == "Right":
             self.update_number(self.text_num2, True, 0, 1, 0.01)
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP )
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) )
             return False
         elif event.Key == "Left":
             self.update_number(self.text_num2, False, 0, 1, 0.01)
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP )
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) )
             return False
         elif event.Key == "Prior":
             self.isPause = False
             self.SetTransparent(255)
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP )
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) )
             return False
         elif event.Key == "Next":
             self.isPause = True
             self.SetTransparent(90)
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP )
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) )
             return False
         elif event.Key == "Insert":
             self.start_setting = True
             self.currentKey = ""
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP )
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) )
             return False
         elif self.start_setting:
             self.currentKey = event.Key
@@ -207,8 +207,8 @@ class MainWindow(wx.Frame):
 
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, pos=(500, 500), style=wx.DEFAULT_FRAME_STYLE ^ (
-                wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW,
-                          size=(55, 75))
+                wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) ,
+                          size=(100, 120))
                           # size=(70, 70))
 
         self.SetBackgroundColour("#ffffff")
@@ -219,28 +219,19 @@ class MainWindow(wx.Frame):
         self.sizer = wx.BoxSizer(wx.VERTICAL)
         self.sizer1 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer2 = wx.BoxSizer(wx.HORIZONTAL)
-        self.sizer3 = wx.BoxSizer(wx.HORIZONTAL)
-        self.sizer4 = wx.BoxSizer(wx.HORIZONTAL)
-        self.sizer5 = wx.BoxSizer(wx.HORIZONTAL)
 
         self.text_num1 = wx.StaticText(self, name="aa", label=str(self.GongSu), size=(-1, -1), style=wx.ALIGN_CENTER)
-
-        self.text_num1.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD))
-
+        self.text_num1.SetFont(wx.Font(30, wx.SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD))
         self.text_num1.SetForegroundColour('#FF0000')
         self.sizer1.Add(self.text_num1, flag=wx.ALIGN_CENTER)
 
         self.text_num2 = wx.StaticText(self, name="aa", label=str(self.QianYao), size=(-1, -1), style=wx.ALIGN_CENTER)
-
-        self.text_num2.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD))
-
+        self.text_num2.SetFont(wx.Font(30, wx.SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD))
         self.text_num2.SetForegroundColour('#0000FF')
-
         self.sizer2.Add(self.text_num2, flag=wx.ALIGN_CENTER)
 
         self.sizer.Add(self.sizer1)
         self.sizer.Add(self.sizer2)
-        self.sizer.Add(self.sizer3)
 
         self.SetSizer(self.sizer)
         self.Show(True)
