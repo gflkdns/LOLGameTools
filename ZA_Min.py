@@ -94,7 +94,7 @@ def sendkey(scancode, pressed):
 
 
 class MainWindow(wx.Frame):
-    minTime = 0.05
+    minTime = 0.1
     press_the_trigger_button = False
     onlyLoL = True
     currentKey = "Capital"
@@ -112,31 +112,56 @@ class MainWindow(wx.Frame):
                 sendkey(0x2e, 1)
             return self.isPause
         elif event.Key == "Up":
-            self.update_number(self.text_num1, True, 0.6, 3.0, 0.02)
+            self.update_number(self.text_num1, True, 0.6, 3.0, 0.1)
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
                     wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
             self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
                     wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
             return False
         elif event.Key == "Down":
-            self.update_number(self.text_num1, False, 0.6, 3.0, 0.02)
+            self.update_number(self.text_num1, False, 0.6, 3.0, 0.1)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
             return False
         elif event.Key == "Right":
             self.update_number(self.text_num2, True, 0, 1, 0.01)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
             return False
         elif event.Key == "Left":
             self.update_number(self.text_num2, False, 0, 1, 0.01)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
             return False
         elif event.Key == "Prior":
             self.isPause = False
             self.SetTransparent(255)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
             return False
         elif event.Key == "Next":
             self.isPause = True
             self.SetTransparent(90)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
             return False
         elif event.Key == "Insert":
             self.start_setting = True
+            self.currentKey = ""
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP | wx.FRAME_TOOL_WINDOW)
+            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
+                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.FRAME_TOOL_WINDOW)
             return False
         elif self.start_setting:
             self.currentKey = event.Key
@@ -156,11 +181,8 @@ class MainWindow(wx.Frame):
     def action(self):
         while True:
             if self.press_the_trigger_button and not self.isPause:
-                # process_time = time.time()
                 self.click(0x2c, self.qy)
                 self.click(0x2d, self.hy)
-                # ys = time.time() - process_time - self.dc
-                # print('单次攻击时间:', round(self.dc, 3), '前摇', round(self.qy, 3), '后摇', round(self.hy, 3), '摇损', ys * 1000)
             else:
                 time.sleep(0.01)
 
