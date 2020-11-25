@@ -221,7 +221,7 @@ class MainWindow(wx.Frame):
 
     def __init__(self, parent, title):
         wx.Frame.__init__(self, parent, title=title, pos=(500, 500), style=wx.DEFAULT_FRAME_STYLE ^ (
-                wx.MAXIMIZE_BOX | wx.RESIZE_BORDER | wx.SYSTEM_MENU),
+                wx.MAXIMIZE_BOX| wx.SYSTEM_MENU),
                           size=(176, 182))
         # size=(70, 70))
 
