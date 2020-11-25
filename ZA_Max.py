@@ -94,16 +94,17 @@ def sendkey(scancode, pressed):
 
 
 class MainWindow(wx.Frame):
-    minTime = 0.05
-    press_the_trigger_button = False
+    minTime = 0.1
     onlyLoL = True
     currentKey = "Capital"
-    GongSu = 1.8
+    GongSu = 1.7
     QianYao = 0.45
     YDBC = 0.0
     dc = 1.0 / GongSu
     qy = dc * QianYao
     hy = dc - qy + YDBC
+
+    press_the_trigger_button = False
 
     def onKeyDown(self, event):
         if event.Key == self.currentKey:
