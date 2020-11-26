@@ -6,6 +6,7 @@ import PyHook3
 import pythoncom
 import wx
 
+# <editor-fold desc="模拟点击部分">
 PUL = POINTER(c_ulong)
 
 
@@ -93,6 +94,59 @@ def sendkey(scancode, pressed):
     windll.user32.SendInput(1, pointer(InputBox), sizeof(InputBox[0]))
 
 
+# </editor-fold>
+
+import wx.adv
+
+
+# <editor-fold desc="系统托盘部分">
+class TaskBarIcon(wx.adv.TaskBarIcon):
+    ID_About = wx.NewId()
+    ID_Close = wx.NewId()
+
+    def __init__(self, frame):
+        wx.adv.TaskBarIcon.__init__(self)
+        self.frame = frame
+        self.SetIcon(wx.Icon(name='icon.ico'), '走A吧少年！')  # wx.ico为ico图标文件
+        self.Bind(wx.adv.EVT_TASKBAR_LEFT_DOWN, self.OnTaskBarLeftDClick)
+        self.Bind(wx.EVT_MENU, self.OnAbout, id=self.ID_About)
+        self.Bind(wx.EVT_MENU, self.OnClose, id=self.ID_Close)
+
+    def OnTaskBarLeftDClick(self, event):
+        if self.frame.IsIconized():
+            self.frame.Iconize(False)
+        if not self.frame.IsShown():
+            self.frame.Show(True)
+        self.frame.Raise()
+
+    def OnAbout(self, event):
+        wx.MessageBox("本程序前提是基于LOL改键,不用担心封号\n"
+                      "请进游戏到设置修改:\n"
+                      "快捷攻击型移动，选择设置成 Z \n"
+                      "控制移动，选择设置成 X \n"
+                      "仅针对目标英雄设置为 C \n"
+                      "最好把窗口设置为无边框模式或者窗口模式\n"
+                      "\n"
+                      "按键说明：\n"
+                      "CapsLock - 触发走A\n"
+                      "上下左右 - 调整参数\n"
+                      "Esc - 关闭软件界面\n"
+                      "帮助文档：https://github.com/miqt/LOLGameTools", '使用帮助')
+
+    def OnClose(self, event):
+        self.Destroy()
+        self.frame.Destroy()
+
+    # 右键菜单
+    def CreatePopupMenu(self):
+        menu = wx.Menu()
+        menu.Append(self.ID_About, '使用帮助')
+        menu.Append(self.ID_Close, '退出')
+        return menu
+
+
+# </editor-fold>
+
 class MainWindow(wx.Frame):
     minTime = 0.1
     onlyLoL = True
@@ -115,67 +169,48 @@ class MainWindow(wx.Frame):
             return self.isPause
         elif event.Key == "Up":
             self.update_number(self.text_num1, True, 0.6, 3.0, 0.1)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU))
+            self.Iconize(False)
+            self.Show(True)
             return False
         elif event.Key == "Down":
             self.update_number(self.text_num1, False, 0.6, 3.0, 0.1)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU))
+            self.Iconize(False)
+            self.Show(True)
             return False
         elif event.Key == "Right":
             self.update_number(self.text_num2, True, 0, 1, 0.01)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU))
+            self.Iconize(False)
             return False
         elif event.Key == "Left":
             self.update_number(self.text_num2, False, 0, 1, 0.01)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU))
+            self.Iconize(False)
             return False
         elif event.Key == "Prior":
             self.isPause = False
             self.SetTransparent(255)
             self.message_text.Label = "已启动,按住[" + self.currentKey + "]走A"
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU))
+            self.Iconize(False)
             return False
         elif event.Key == "Next":
             self.isPause = True
             self.SetTransparent(90)
             self.message_text.Label = "已关闭"
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU))
+            self.Iconize(False)
             return False
         elif event.Key == "Insert":
             self.start_setting = True
             self.currentKey = ""
             self.message_text.Label = "按任意键完成绑定"
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU))
+            self.Iconize(False)
+            return False
+        elif not self.IsIconized() and event.Key == "Escape":
+            self.Iconize(True)
             return False
         elif self.start_setting:
             self.currentKey = event.Key
             self.start_setting = False
             self.message_text.Label = "已经绑定到：" + self.currentKey
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP)
-            self.SetWindowStyle(wx.DEFAULT_FRAME_STYLE ^ (
-                    wx.MAXIMIZE_BOX | wx.SYSTEM_MENU))
+            self.Iconize(False)
             return False
         return True
 
@@ -219,14 +254,20 @@ class MainWindow(wx.Frame):
         hm.HookKeyboard()
         pythoncom.PumpMessages()
 
+    def OnClose(self, event):
+        # self.taskBarIcon.Destroy()
+        # self.Destroy()
+        self.Iconize(True)
+
     def __init__(self, parent, title):
-        wx.Frame.__init__(self, parent, title=title, pos=(500, 500), style=wx.DEFAULT_FRAME_STYLE ^ (
-                wx.MAXIMIZE_BOX| wx.SYSTEM_MENU),
+        wx.Frame.__init__(self, parent, title=title, pos=wx.DefaultPosition, style=wx.DEFAULT_FRAME_STYLE ^ (
+                wx.MAXIMIZE_BOX | wx.SYSTEM_MENU) | wx.STAY_ON_TOP,
                           size=(176, 182))
-        # size=(70, 70))
 
         self.SetBackgroundColour("#ffffff")
-
+        self.SetIcon(wx.Icon('icon.ico'))
+        self.taskBarIcon = TaskBarIcon(self)
+        self.Bind(wx.EVT_CLOSE, self.OnClose)
         self.isPause = False
         self.start_setting = False
 
@@ -365,7 +406,7 @@ class MainWindow(wx.Frame):
             num = num[0:4]
         who.SetLabel(num)
 
-
 app = wx.App(False)
 ui = MainWindow(None, "摇头怪!")
+ui.Centre()
 app.MainLoop()

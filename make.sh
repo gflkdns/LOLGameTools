@@ -2,11 +2,13 @@ rm -rf __pycache__
 rm -rf build
 rm -rf dist
 rm -rf *.spec
-pyinstaller -F -w ZA_Min.py
-pyinstaller -F -w ZA_Max.py
+pyinstaller -F -w ZA_Max.py -i icon.ico
 rm -rf __pycache__
 rm -rf build
 rm -rf *.spec
+
+cp -rf icon.ico dist
+
 get_char()
 {
 SAVEDSTTY=`stty -g`
