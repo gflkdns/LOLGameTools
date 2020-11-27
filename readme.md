@@ -36,6 +36,3 @@
 
 下载：https://github.com/miqt/LOLGameTools/releases
 
-ZA_Max.py 完整UI版
-ZA_Min.py 极致精简版
-

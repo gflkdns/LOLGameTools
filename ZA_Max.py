@@ -126,12 +126,12 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
                       "控制移动，选择设置成 X \n"
                       "仅针对目标英雄设置为 C \n"
                       "最好把窗口设置为无边框模式或者窗口模式\n"
-                      "\n"
                       "按键说明：\n"
                       "CapsLock - 触发走A\n"
                       "上下左右 - 调整参数\n"
-                      "Esc - 关闭软件界面\n"
-                      "帮助文档：https://github.com/miqt/LOLGameTools", '使用帮助')
+                      "Esc - 最小化到托盘区\n"
+                      "详细说明：https://github.com/miqt/LOLGameTools\n"
+                      "联系作者：miqtdev@163.com", '使用帮助')
 
     def OnClose(self, event):
         self.Destroy()
@@ -356,17 +356,17 @@ class MainWindow(wx.Frame):
     def onClick(self, event):
         name = event.GetEventObject().GetName()
         if name == "up1":
-            self.update_number(self.text_num1, True, 0.1, 3.0, 0.1)
+            self.update_number(self.text_num1, True, 0.1, 3.5, 0.1)
         elif name == "down1":
-            self.update_number(self.text_num1, False, 0.1, 3.0, 0.1)
+            self.update_number(self.text_num1, False, 0.1, 3.5, 0.1)
         elif name == "up2":
             self.update_number(self.text_num2, True, 0.1, 0.9, 0.05)
         elif name == "down2":
             self.update_number(self.text_num2, False, 0.1, 0.9, 0.05)
         elif name == "up3":
-            self.update_number(self.text_num3, True, 0.0, 3.0, 0.1)
+            self.update_number(self.text_num3, True, 0.0, 1.0, 0.01)
         elif name == "down3":
-            self.update_number(self.text_num3, False, 0.0, 3.0, 0.1)
+            self.update_number(self.text_num3, False, 0.0, 1.0, 0.01)
         elif name == "start":
             self.isPause = False
             self.SetTransparent(255)  # 设置透明
@@ -407,6 +407,6 @@ class MainWindow(wx.Frame):
         who.SetLabel(num)
 
 app = wx.App(False)
-ui = MainWindow(None, "摇头怪!")
+ui = MainWindow(None, "刀!")
 ui.Centre()
 app.MainLoop()
