@@ -227,6 +227,8 @@ class MainWindow(wx.Frame):
         while True:
             if self.press_the_trigger_button and not self.isPause:
                 process_time = time.time()
+                # 天使前置按 E 10 (Q), 11 (W), 12 (E), 13 (R)
+                # self.click(0x10, 0)
                 self.click(0x2c, self.qy)
                 self.click(0x2d, self.hy)
                 ys = time.time() - process_time - self.dc - self.YDBC
@@ -242,7 +244,7 @@ class MainWindow(wx.Frame):
             sendkey(key, 0)
             time.sleep(self.minTime)
             click_time = click_time - (time.time() - process_time)
-        if self.press_the_trigger_button and click_time > 0:
+        if self.press_the_trigger_button and click_time >= 0:
             sendkey(key, 1)
             sendkey(key, 0)
             time.sleep(click_time)
