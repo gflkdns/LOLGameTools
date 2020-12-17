@@ -95,101 +95,27 @@ def sendkey(scancode, pressed):
 
 # </editor-fold>
 
-
-def getRgb(x, y):
-    gdi32 = windll.gdi32
-    user32 = windll.user32
-    hdc = user32.GetDC(None)  # 获取颜值
-    pixel = gdi32.GetPixel(hdc, x, y)  # 提取RGB值
-    r = pixel & 0x0000ff
-    g = (pixel & 0x00ff00) >> 8
-    b = pixel >> 16
-    return [r, g, b]
-
-
-def get_color(r, g, b):
-    if (r < 127 and g < 127 and b > 127):
-        return ("蓝")
-    elif (r < 127 and g > 127 and b < 127):
-        return ("绿")
-    elif (r > 127 and g < 127 and b < 127):
-        return ('红')
-    elif (r > 127 and g > 127 and b < 127):
-        return ("黄")
-    elif (r > 127 and g < 127 and b > 127):
-        return ("紫")
-    elif (r < 127 and g > 127 and b > 127):
-        return ("青")
-    elif (r > 127 and g > 127 and b > 127):
-        return ('白')
-    elif (r < 127 and g < 127 and b < 127):
-        return ('黑')
-
 def down(event):
     # 10 (Q), 11 (W), 12 (E), 13 (R)
     key = event.Key
-    global req_color
-    if key == "E":
-        req_color = '黄'
-        threading.Thread(target=click).start()
-    elif key == "W":
-        global self_w
-        if not self_w:
-            req_color = '蓝'
-            threading.Thread(target=click).start()
-        else:
-            self_w = False
-    elif key == "A":
-        req_color = '红'
-        threading.Thread(target=click).start()
+    if key == "2" or key == "4":
+        threading.Thread(target=check_w).start()
     return True
 
 
-
-
-
-self_w = False
-req_color = "黄"
-
-
-def click():
-    global req_color
-    print('开始监听', req_color)
-    process_time = time.time()
-    while time.time() - process_time < 5:
-        r, g, b = getRgb(x, y)
-        color = get_color(r, g, b)
-        if color == req_color:
-            global self_w
-            self_w = True
-            sendkey(0x11, 1)
-            sendkey(0x11, 0)
-            print('抽牌成功', req_color)
-            return
-        time.sleep(0.05)
-    print('抽牌失败', req_color)
-
-
-def move(event):
-    global x, y
-    x = event.Position[0]
-    y = event.Position[1]
-    print("当前取色坐标：", x, y, '祝您游戏愉快')
-    return True
+def check_w():
+    time.sleep(0.05)
+    sendkey(0x10, 1)
+    sendkey(0x10, 0)
 
 
 def action():
     hm = PyHook3.HookManager()
     hm.KeyDown = down
-    hm.MouseMiddleDown = move
     hm.HookKeyboard()
-    hm.HookMouse()
     pythoncom.PumpMessages()
 
 
-x = 100
-y = 100
-print('一切尽在卡牌中！，光速抽牌，已经启动：E：黄牌，W：蓝牌,T：红牌')
-print('请按下 鼠标中间滑轮按键 确定卡牌取色位置：')
+print('武器大师光速摸眼启动')
+print('2，4，插眼自动Q摸眼')
 action()
-
