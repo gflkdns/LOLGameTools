@@ -129,20 +129,32 @@ def down(event):
     # 10 (Q), 11 (W), 12 (E), 13 (R)
     key = event.Key
     global req_color
+    global self_w
     if key == "E":
         req_color = '黄'
+        # 先按一下W，开始选牌
+        self_w = True
+        sendkey(0x11, 1)
+        sendkey(0x11, 0)
         threading.Thread(target=click).start()
     elif key == "W":
-        global self_w
         if not self_w:
             req_color = '蓝'
             threading.Thread(target=click).start()
         else:
             self_w = False
     elif key == "T":
+        # 先按一下W，开始选牌
+        self_w = True
+        sendkey(0x11, 1)
+        sendkey(0x11, 0)
         req_color = '红'
         threading.Thread(target=click).start()
     elif key == "R":
+        # 先按一下W，开始选牌
+        self_w = True
+        sendkey(0x11, 1)
+        sendkey(0x11, 0)
         req_color = '黄'
         threading.Thread(target=click).start()
     return True
@@ -158,9 +170,6 @@ req_color = "黄"
 def click():
     # 先按一下W
     global self_w
-    self_w = True
-    sendkey(0x11, 1)
-    sendkey(0x11, 0)
     global req_color
     print('开始监听', req_color)
     process_time = time.time()
