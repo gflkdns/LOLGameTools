@@ -3,6 +3,7 @@ rm -rf build
 rm -rf dist
 rm -rf *.spec
 pyinstaller -F -w ZA_Max.py -i icon.ico
+pyinstaller -F KaPai.py -i icon.ico
 rm -rf __pycache__
 rm -rf build
 rm -rf *.spec
