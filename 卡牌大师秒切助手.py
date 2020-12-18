@@ -128,40 +128,38 @@ def get_color(r, g, b):
 def down(event):
     # 10 (Q), 11 (W), 12 (E), 13 (R)
     key = event.Key
-    global req_color
+
     global self_w
     if key == "E":
-        req_color = '黄'
-        # 先按一下W，开始选牌
         self_w = True
         sendkey(0x11, 1)
         sendkey(0x11, 0)
-        threading.Thread(target=click).start()
+        tryLisCard('黄')
     elif key == "W":
         if not self_w:
-            req_color = '蓝'
-            threading.Thread(target=click).start()
+            tryLisCard('蓝')
         else:
             self_w = False
-    elif key == "T":
-        # 先按一下W，开始选牌
+    elif key == "A":
         self_w = True
         sendkey(0x11, 1)
         sendkey(0x11, 0)
-        req_color = '红'
-        threading.Thread(target=click).start()
+        tryLisCard('红')
     elif key == "R":
-        # 先按一下W，开始选牌
         self_w = True
         sendkey(0x11, 1)
         sendkey(0x11, 0)
-        req_color = '黄'
-        threading.Thread(target=click).start()
+        tryLisCard('黄')
     return True
 
 
-
-
+def tryLisCard(color):
+    global req_color, process_time, last_thread
+    req_color = color
+    process_time = time.time()
+    if not last_thread.isAlive():
+        last_thread = threading.Thread(target=click)
+        last_thread.start()
 
 self_w = False
 req_color = "黄"
@@ -169,11 +167,10 @@ req_color = "黄"
 
 def click():
     # 先按一下W
-    global self_w
-    global req_color
+    global self_w, process_time, req_color
     print('开始监听', req_color)
     process_time = time.time()
-    while time.time() - process_time < 5:
+    while time.time() - process_time < 4:
         r, g, b = getRgb(x, y)
         color = get_color(r, g, b)
         if color == req_color:
@@ -203,9 +200,10 @@ def action():
     pythoncom.PumpMessages()
 
 
+last_thread = threading.Thread(target=click)
+process_time = time.time()
 x = 100
 y = 100
 print('一切尽在卡牌中！，光速抽牌，已经启动：E：黄牌，W：蓝牌，T：红牌，大招自动黄牌')
 print('请按下 鼠标中间滑轮按键 确定卡牌取色位置：')
 action()
-
