@@ -108,22 +108,24 @@ def getRgb(x, y):
 
 
 def get_color(r, g, b):
-    if (r < 127 and g < 127 and b > 127):
+    if r == g == b:
+        return '灰'
+    if (r <= 127 and g <= 127 and b >= 127):
         return ("蓝")
-    elif (r < 127 and g > 127 and b < 127):
+    elif (r <= 127 and g >= 127 and b <= 127):
         return ("绿")
-    elif (r > 127 and g < 127 and b < 127):
+    elif (r >= 127 and g <= 127 and b <= 127):
         return ('红')
-    elif (r > 127 and g > 127 and b < 127):
+    elif (r >= 127 and g >= 127 and b <= 127):
         return ("黄")
-    elif (r > 127 and g < 127 and b > 127):
+    elif (r >= 127 and g <= 127 and b >= 127):
         return ("紫")
-    elif (r < 127 and g > 127 and b > 127):
-        return ("青")
-    elif (r > 127 and g > 127 and b > 127):
-        return ('白')
-    elif (r < 127 and g < 127 and b < 127):
-        return ('黑')
+    elif (r <= 127 and g >= 127 and b >= 127):
+        return ("蓝")
+    elif (r >= 127 and g >= 127 and b >= 127):
+        return get_color(r - 1, g - 1, b - 1)
+    elif (r <= 127 and g <= 127 and b <= 127):
+        return get_color(r + 1, g + 1, b + 1)
 
 def down(event):
     # 10 (Q), 11 (W), 12 (E), 13 (R)
@@ -188,6 +190,8 @@ def move(event):
     x = event.Position[0]
     y = event.Position[1]
     print("当前取色坐标：", x, y, '祝您游戏愉快')
+    r, g, b = getRgb(x, y)
+    print("当前颜色：", get_color(r, g, b))
     return True
 
 
@@ -202,8 +206,8 @@ def action():
 
 last_thread = threading.Thread(target=click)
 process_time = time.time()
-x = 100
-y = 100
-print('一切尽在卡牌中！，光速抽牌，已经启动：E：黄牌，W：蓝牌，T：红牌，大招自动黄牌')
-print('请按下 鼠标中间滑轮按键 确定卡牌取色位置：')
+x = 827
+y = 975
+print('一切尽在卡牌中！光速抽牌，已经启动：E：黄牌，W：蓝牌，A：红牌，大招自动黄牌')
+print('按下 鼠标中间滑轮按键 确定卡牌取色位置，当前位置：', x, y)
 action()

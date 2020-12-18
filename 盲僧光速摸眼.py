@@ -104,7 +104,7 @@ def down(event):
 
 
 def check_w():
-    time.sleep(0.05)
+    time.sleep(0.2)
     sendkey(0x11, 1)
     sendkey(0x11, 0)
 
