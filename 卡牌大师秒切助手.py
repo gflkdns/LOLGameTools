@@ -131,57 +131,71 @@ def down(event):
     # 10 (Q), 11 (W), 12 (E), 13 (R)
     key = event.Key
 
-    global self_w
+
     if key == "E":
-        self_w = True
-        sendkey(0x11, 1)
-        sendkey(0x11, 0)
         tryLisCard('黄')
     elif key == "W":
-        if not self_w:
+        global self_w
+        if self_w <= 0:
+            # 是键盘按的W
+            print(self_w, "w 键盘按的,拦截")
             tryLisCard('蓝')
+            # 将这个事件拦截,软件会帮助按
+            return False
         else:
-            self_w = False
+            print(self_w, "w 程序按的")
+            self_w = self_w - 1
     elif key == "A":
-        self_w = True
-        sendkey(0x11, 1)
-        sendkey(0x11, 0)
         tryLisCard('红')
     elif key == "R":
-        self_w = True
-        sendkey(0x11, 1)
-        sendkey(0x11, 0)
+        # 按第二次R开始抽牌
         tryLisCard('黄')
     return True
 
 
 def tryLisCard(color):
-    global req_color, process_time, last_thread
+    global self_w, req_color, process_time, last_thread
+    # 按 w 开始选牌
+    click_W()
+    # 更新当前需求的颜色为最近一次按下需要的颜色
     req_color = color
+    # 更新技能CD为最近按下的时间
     process_time = time.time()
+    # 开始监听选牌，没启动则启动线程
     if not last_thread.isAlive():
         last_thread = threading.Thread(target=click)
         last_thread.start()
 
-self_w = False
+
+def click_W():
+    global self_w
+    # 标记是本软件按下的W
+    self_w = self_w + 1
+    sendkey(0x11, 1)
+    sendkey(0x11, 0)
+
+
+self_w = 0
 req_color = "黄"
 
 
 def click():
-    # 先按一下W
-    global self_w, process_time, req_color
-    print('开始监听', req_color)
+    global process_time, req_color
     process_time = time.time()
-    while time.time() - process_time < 4:
-        r, g, b = getRgb(x, y)
-        color = get_color(r, g, b)
-        if color == req_color:
-            self_w = True
-            sendkey(0x11, 1)
-            sendkey(0x11, 0)
-            print('抽牌成功', req_color)
-            return
-        time.sleep(0.05)
+    # 离上次按下的时间超过 3 秒还没选到牌，则选牌失败
+    while time.time() - process_time < 3:
+        if time.time() - process_time < 0.15:
+            print("等待技能动画释放")
+        else:
+            # 开始抽牌
+            r, g, b = getRgb(x, y)
+            color = get_color(r, g, b)
+            if color == req_color:
+                click_W()
+                print('抽牌成功', req_color)
+                return
+        # 刷新频率，按照每秒 30 帧刷新
+        time.sleep(0.034)
     print('抽牌失败', req_color)
 
 
