@@ -154,8 +154,16 @@ def down(event):
     elif key == "A":
         tryLisCard('红')
     elif key == "R":
-        # 按第二次R开始抽牌
-        tryLisCard('黄')
+        global last_R_time
+        # 是否距离上次按R过去了2秒
+        if time.time() - last_R_time > 8:
+            # 第一次R
+            last_R_time = time.time()
+        else:
+            # 第二次R
+            last_R_time = 0
+            # 按第二次R开始抽牌
+            tryLisCard('黄')
     return True
 
 
@@ -192,6 +200,7 @@ def click_W():
 self_w = 0
 req_color = "黄"
 ctrl_press = False
+last_R_time = 0
 
 
 def click():
