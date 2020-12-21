@@ -130,7 +130,13 @@ def get_color(r, g, b):
 def down(event):
     # 10 (Q), 11 (W), 12 (E), 13 (R)
     key = event.Key
-
+    global ctrl_press
+    if key == 'Lcontrol' or key == 'Rcontrol':
+        ctrl_press = True
+        return True
+    # ctrl 按下中是升级技能操作，不响应抽牌
+    if ctrl_press:
+        return True
 
     if key == "E":
         tryLisCard('黄')
@@ -150,6 +156,14 @@ def down(event):
     elif key == "R":
         # 按第二次R开始抽牌
         tryLisCard('黄')
+    return True
+
+
+def up(event):
+    key = event.Key
+    global ctrl_press
+    if key == 'Lcontrol' or key == 'Rcontrol':
+        ctrl_press = False
     return True
 
 
@@ -177,6 +191,7 @@ def click_W():
 
 self_w = 0
 req_color = "黄"
+ctrl_press = False
 
 
 def click():
@@ -212,6 +227,7 @@ def move(event):
 def action():
     hm = PyHook3.HookManager()
     hm.KeyDown = down
+    hm.KeyUp = up
     hm.MouseMiddleDown = move
     hm.HookKeyboard()
     hm.HookMouse()
