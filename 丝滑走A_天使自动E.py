@@ -168,24 +168,34 @@ class MainWindow(wx.Frame):
                 # 按下 C 显示攻击距离,并且仅选中英雄
                 sendkey(0x2e, 1)
             return self.isPause
+        elif event.Key == "Volume_Down":
+            self.update_number(self.text_num1, False, 0.6, 3.0, 0.01)
+            self.Iconize(False)
+            self.Show(True)
+            return self.isPause
+        elif event.Key == "Volume_Up":
+            self.update_number(self.text_num1, True, 0.6, 3.0, 0.01)
+            self.Iconize(False)
+            self.Show(True)
+            return self.isPause
         elif event.Key == "Up":
             self.update_number(self.text_num1, True, 0.6, 3.0, 0.1)
             self.Iconize(False)
             self.Show(True)
-            return False
+            return self.isPause
         elif event.Key == "Down":
             self.update_number(self.text_num1, False, 0.6, 3.0, 0.1)
             self.Iconize(False)
             self.Show(True)
-            return False
+            return self.isPause
         elif event.Key == "Right":
             self.update_number(self.text_num2, True, 0, 1, 0.01)
             self.Iconize(False)
-            return False
+            return self.isPause
         elif event.Key == "Left":
             self.update_number(self.text_num2, False, 0, 1, 0.01)
             self.Iconize(False)
-            return False
+            return self.isPause
         elif event.Key == "Prior":
             self.isPause = False
             self.SetTransparent(255)
