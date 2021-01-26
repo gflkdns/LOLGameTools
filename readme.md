@@ -1,7 +1,3 @@
-2020年12月17日:新增光速摸眼以及卡牌大师秒抽黄牌。
-
-C:\Program Files\Tesseract-OCR 配置环境变量
-
 本程序是LOL走A辅助程序，手残又想玩ADC福利，使用模拟按键的方式，所以不用担心封号
 
 本程序前提是基于LOL改键
@@ -39,4 +35,7 @@ C:\Program Files\Tesseract-OCR 配置环境变量
 
 下载：https://github.com/miqt/LOLGameTools/releases  
 加群搞事情：qq：209622340
+
+
+> 2021年1月26日 更新自动获取攻速支持 | 感谢 [ztgreenleaves](https://github.com/ztgreenleaves) 提供自动获取攻速的功能！
 
