@@ -17,13 +17,13 @@ def getAttackSpeed(x_begin=528-142, y_begin=1069-63, x_end=528, y_end=1069):
     # 第二个参数 开始截图的y坐标
     # 第三个参数 结束截图的x坐标
     # 第四个参数 结束截图的y坐标
+    # todo 这里比较耗时，可以优化
+    image = ImageGrab.grab((x_begin, y_begin, x_end, y_end))
+    text = pytesseract.image_to_string(
+        image=image,
+        lang="digits",
+        config="--psm 6 --oem 3 -c tessedit_char_whitelist=.0123456789")
 
-    bbox = (x_begin, y_begin, x_end, y_end)
-    im = ImageGrab.grab(bbox)
-    im.save('cut.png')
-    # 调用tesseract识别图像
-    text = pytesseract.image_to_string(ImageGrab.grab(bbox), lang="eng")
-    print(text)
     # 筛选出识别出的一堆数据中的小数
     matchObj = re.search(r'[0-5]\.[0-9]{1,2}', text)
     if matchObj:
@@ -274,10 +274,14 @@ class MainWindow(wx.Frame):
         return True
 
     def MouseMiddleDown(self, event):
-        self.x_begin = event.Position[0]-30
-        self.x_end = event.Position[0]+30
-        self.y_begin = event.Position[1]-20
-        self.y_end = event.Position[1]+20
+        self.x_begin = event.Position[0] - 30
+        self.x_end = event.Position[0] + 30
+        self.y_begin = event.Position[1] - 20
+        self.y_end = event.Position[1] + 20
+        self.message_text.Label = "攻速识别区域更新"
+        im = ImageGrab.grab((self.x_begin, self.y_begin, self.x_end, self.y_end))
+        im = im.convert("L")
+        im.show("预览")
         return True
 
     def action(self):
@@ -295,12 +299,14 @@ class MainWindow(wx.Frame):
                 time.sleep(0.01)
 
     def click(self, key, click_time):
+        # 按照一定的频率高速点击
         while click_time > self.minTime and self.press_the_trigger_button:
             process_time = time.time()
             sendkey(key, 1)
             sendkey(key, 0)
             time.sleep(self.minTime)
             click_time = click_time - (time.time() - process_time)
+        # 剩余时间不足最小点击频率单位，直接点击一次，然后等待到剩余时间结束
         if self.press_the_trigger_button and click_time >= 0:
             sendkey(key, 1)
             sendkey(key, 0)
@@ -318,6 +324,7 @@ class MainWindow(wx.Frame):
     def listenerAttackSpeed(self, ):
         # 新线程识别攻速，防止因为识别耗时阻塞走A线程
         while True:
+            time.sleep(0.1)
             # a = time.time()
             speed = getAttackSpeed(x_begin=self.x_begin, y_begin=self.y_begin, x_end=self.x_end, y_end=self.y_end)
             # print(time.time() - a)
