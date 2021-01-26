@@ -166,6 +166,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
                       "Esc - 最小化到托盘区\n"
                       "鼠标中间滚轮按下 - 设置攻速识别位置"
                       "详细说明：https://github.com/miqt/LOLGameTools\n"
+                      "QQ群：209622340\n"
                       "联系作者：miqtdev@163.com", '使用帮助')
 
     def OnClose(self, event):
