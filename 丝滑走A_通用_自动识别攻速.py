@@ -7,7 +7,6 @@ import PyHook3
 import pytesseract
 import pythoncom
 import wx
-from PIL import Image
 from PIL import ImageGrab
 
 
@@ -20,19 +19,21 @@ def getAttackSpeed(x_begin=528-142, y_begin=1069-63, x_end=528, y_end=1069):
     # 第四个参数 结束截图的y坐标
 
     bbox = (x_begin, y_begin, x_end, y_end)
-    # im = ImageGrab.grab(bbox)
-    # im.save('cut.png')
+    im = ImageGrab.grab(bbox)
+    im.save('cut.png')
     # 调用tesseract识别图像
     text = pytesseract.image_to_string(ImageGrab.grab(bbox), lang="eng")
-    # print(text)
+    print(text)
     # 筛选出识别出的一堆数据中的小数
     matchObj = re.search(r'[0-5]\.[0-9]{1,2}', text)
-    if (matchObj):
-        attackSpeed = float(matchObj.group(0))
-        # 偶尔会把1识别成7，如果为7则返回0
-        if (attackSpeed == 7):
-            return 1
-        return attackSpeed
+    if matchObj:
+        test = matchObj.group(0)
+        if len(test) >= 3:
+            if test[0:3] == "0.1":
+                test = "0.7" + test[3:]
+            if test[0:1] == "7":
+                test = "1" + test[1:]
+            return float(test)
 
 
 # </editor-fold>
@@ -163,6 +164,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
                       "CapsLock - 触发走A\n"
                       "上下左右 - 调整参数\n"
                       "Esc - 最小化到托盘区\n"
+                      "鼠标中间滚轮按下 - 设置攻速识别位置"
                       "详细说明：https://github.com/miqt/LOLGameTools\n"
                       "联系作者：miqtdev@163.com", '使用帮助')
 
@@ -190,6 +192,11 @@ class MainWindow(wx.Frame):
     dc = 1.0 / GongSu
     qy = dc * QianYao
     hy = dc - qy + YDBC
+
+    x_begin = 528 - 142
+    y_begin = 1069 - 63
+    x_end = 528
+    y_end = 1069
 
     press_the_trigger_button = False
 
@@ -266,6 +273,13 @@ class MainWindow(wx.Frame):
             return self.isPause
         return True
 
+    def MouseMiddleDown(self, event):
+        self.x_begin = event.Position[0]-30
+        self.x_end = event.Position[0]+30
+        self.y_begin = event.Position[1]-20
+        self.y_end = event.Position[1]+20
+        return True
+
     def action(self):
         while True:
             if self.press_the_trigger_button and not self.isPause:
@@ -296,17 +310,21 @@ class MainWindow(wx.Frame):
         hm = PyHook3.HookManager()
         hm.KeyDown = self.onKeyDown
         hm.KeyUp = self.onKeyUp
+        hm.MouseMiddleDown = self.MouseMiddleDown
         hm.HookKeyboard()
+        hm.HookMouse()
         pythoncom.PumpMessages()
 
     def listenerAttackSpeed(self, ):
         # 新线程识别攻速，防止因为识别耗时阻塞走A线程
         while True:
-            speed = getAttackSpeed()
+            # a = time.time()
+            speed = getAttackSpeed(x_begin=self.x_begin, y_begin=self.y_begin, x_end=self.x_end, y_end=self.y_end)
+            # print(time.time() - a)
             if speed is None:
-                print("未识别到攻速")
+                # print("未识别到攻速")
                 continue
-            print("识别到攻速为：" + str(speed))
+            # print("识别到攻速为：" + str(speed))
             if speed <= 0 or speed >= 6.0:
                 continue
             self.GongSu = speed
@@ -314,8 +332,6 @@ class MainWindow(wx.Frame):
             self.qy = self.dc * self.QianYao
             self.hy = self.dc - self.qy + self.YDBC
             self.text_num1.SetLabel(str(speed))
-            # 识别频率不要太快，一秒10次，防止CPU耗尽
-            time.sleep(0.1)
 
     def OnClose(self, event):
         # self.taskBarIcon.Destroy()
