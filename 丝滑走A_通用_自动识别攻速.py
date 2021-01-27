@@ -6,24 +6,53 @@ from ctypes import POINTER, c_ulong, Structure, c_ushort, c_short, c_long, byref
 import PyHook3
 import pytesseract
 import pythoncom
+import win32con
+import win32gui
+import win32ui
 import wx
-from PIL import ImageGrab
+from PIL import Image
+
+
+def get_screenshot(left, top, width, height):
+    # 获取桌面截图
+    hdesktop = win32gui.GetDesktopWindow()
+    # 分辨率适应
+    # width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
+    # height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
+    # left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
+    # top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
+    # 创建设备描述表
+    desktop_dc = win32gui.GetWindowDC(hdesktop)
+    img_dc = win32ui.CreateDCFromHandle(desktop_dc)
+    # 创建一个内存设备描述表
+    mem_dc = img_dc.CreateCompatibleDC()
+    # 创建位图对象
+    screenshot = win32ui.CreateBitmap()
+    screenshot.CreateCompatibleBitmap(img_dc, width, height)
+    mem_dc.SelectObject(screenshot)
+    # 截图至内存设备描述表
+    mem_dc.BitBlt((0, 0), (width, height), img_dc, (left, top), win32con.SRCCOPY)
+    # 将截图保存到文件中
+    # screenshot.SaveBitmapFile(mem_dc, 'screenshot.bmp')
+    # 转成Image
+    bmparray = screenshot.GetBitmapBits(True)
+    bmpinfo = screenshot.GetInfo()
+    # RGB 是彩色，L 是灰色
+    pil_im = Image.frombuffer('RGB', (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
+                              bmparray, 'raw', 'BGRX', 0, 1).convert("L")
+    # 内存释放
+    mem_dc.DeleteDC()
+    win32gui.DeleteObject(screenshot.GetHandle())
+    return pil_im
 
 
 # <editor-fold desc="图片识别攻速部分">
-def getAttackSpeed(x_begin=528-142, y_begin=1069-63, x_end=528, y_end=1069):
-    # 参数说明
-    # 第一个参数 开始截图的x坐标
-    # 第二个参数 开始截图的y坐标
-    # 第三个参数 结束截图的x坐标
-    # 第四个参数 结束截图的y坐标
-    # todo 这里比较耗时，可以优化
-    image = ImageGrab.grab((x_begin, y_begin, x_end, y_end))
+def getAttackSpeed(x_begin=385, y_begin=1010, x_end=433, y_end=1036):
+    image = get_screenshot(x_begin, y_begin, x_end - x_begin, y_end - y_begin)  # x,y,w,h
     text = pytesseract.image_to_string(
         image=image,
         lang="digits",
         config="--psm 6 --oem 3 -c tessedit_char_whitelist=.0123456789")
-
     # 筛选出识别出的一堆数据中的小数
     matchObj = re.search(r'[0-5]\.[0-9]{1,2}', text)
     if matchObj:
@@ -279,10 +308,16 @@ class MainWindow(wx.Frame):
         self.x_end = event.Position[0] + 30
         self.y_begin = event.Position[1] - 20
         self.y_end = event.Position[1] + 20
-        self.message_text.Label = "攻速识别区域更新"
-        im = ImageGrab.grab((self.x_begin, self.y_begin, self.x_end, self.y_end))
-        im = im.convert("L")
-        im.show("预览")
+        image = get_screenshot(self.x_begin,
+                               self.y_begin,
+                               self.x_end - self.x_begin,
+                               self.y_end - self.y_begin)  # x,y,w,h
+        text = pytesseract.image_to_string(
+            image=image,
+            lang="digits",
+            config="--psm 6 --oem 3 -c tessedit_char_whitelist=.0123456789")
+
+        self.message_text.Label = "更新识别区域：" + str(event.Position) + " " + text
         return True
 
     def action(self):
@@ -325,10 +360,7 @@ class MainWindow(wx.Frame):
     def listenerAttackSpeed(self, ):
         # 新线程识别攻速，防止因为识别耗时阻塞走A线程
         while True:
-            time.sleep(0.1)
-            # a = time.time()
             speed = getAttackSpeed(x_begin=self.x_begin, y_begin=self.y_begin, x_end=self.x_end, y_end=self.y_end)
-            # print(time.time() - a)
             if speed is None:
                 # print("未识别到攻速")
                 continue
