@@ -317,7 +317,9 @@ class MainWindow(wx.Frame):
             lang="digits",
             config="--psm 6 --oem 3 -c tessedit_char_whitelist=.0123456789")
 
-        self.message_text.Label = "更新识别区域：" + str(event.Position) + " " + text
+        self.message_text.Label = "识别区：" + str(event.Position) + " " + text
+        self.Iconize(False)
+        self.Show(True)
         return True
 
     def action(self):

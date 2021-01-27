@@ -16,3 +16,4 @@ rm -rf build
 rm -rf *.spec
 
 cp -rf icon.ico dist
+cp -rf Tesseract-OCR dist
