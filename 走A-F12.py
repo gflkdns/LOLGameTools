@@ -6,14 +6,29 @@ from ctypes import POINTER, c_ulong, Structure, c_ushort, c_short, c_long, byref
 import PyHook3
 import pytesseract
 import pythoncom
+import win32api
 import win32con
 import win32gui
-import win32ui
+import win32print
 import wx
 from PIL import Image
 
 
+def getMousePos():
+    hDC = win32gui.GetDC(0)
+    pos = win32api.GetCursorPos()
+    width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
+    height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
+    w = win32print.GetDeviceCaps(hDC, win32con.DESKTOPHORZRES)
+    h = win32print.GetDeviceCaps(hDC, win32con.DESKTOPVERTRES)
+    zoomx = w / width
+    zoomh = h / height
+    pos = (int(pos[0] * zoomx), int(pos[1] * zoomh))
+    return pos
+
+
 def get_screenshot(left, top, width, height):
+    import win32ui
     # 获取桌面截图
     hdesktop = win32gui.GetDesktopWindow()
     # 分辨率适应
@@ -193,7 +208,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
                       "CapsLock - 触发走A\n"
                       "上下左右 - 调整参数\n"
                       "Esc - 最小化到托盘区\n"
-                      "鼠标中间滚轮按下 - 设置攻速识别位置"
+                      "F12 - 设置攻速识别位置（鼠标当前位置）"
                       "详细说明：https://github.com/miqt/LOLGameTools\n"
                       "QQ群：209622340\n"
                       "联系作者：miqtdev@163.com", '使用帮助')
@@ -227,7 +242,6 @@ class MainWindow(wx.Frame):
     y_begin = 1069 - 63
     x_end = 528
     y_end = 1069
-
     press_the_trigger_button = False
 
     def onKeyDown(self, event):
@@ -236,6 +250,26 @@ class MainWindow(wx.Frame):
             if self.onlyLoL and not self.isPause:
                 # 按下 C 显示攻击距离,并且仅选中英雄
                 sendkey(0x2e, 1)
+            return self.isPause
+        elif event.Key == "F12":
+            pos = getMousePos()
+            print(pos)
+            self.x_begin = pos[0] - 30
+            self.x_end = pos[0] + 30
+            self.y_begin = pos[1] - 20
+            self.y_end = pos[1] + 20
+            image = get_screenshot(self.x_begin,
+                                   self.y_begin,
+                                   self.x_end - self.x_begin,
+                                   self.y_end - self.y_begin)  # x,y,w,h
+            text = pytesseract.image_to_string(
+                image=image,
+                lang="digits",
+                config="--psm 6 --oem 3 -c tessedit_char_whitelist=.0123456789")
+
+            wx.MessageBox("识别区已经更新成功！\n"
+                          "当前区域：" + str(pos) +
+                          "\n当前识别到的文字：" + text, '更新识别区域')
             return self.isPause
         elif event.Key == "Volume_Down":
             self.update_number(self.text_num1, False, 0.6, 3.0, 0.01)
@@ -303,25 +337,6 @@ class MainWindow(wx.Frame):
             return self.isPause
         return True
 
-    def MouseMiddleDown(self, event):
-        self.x_begin = event.Position[0] - 30
-        self.x_end = event.Position[0] + 30
-        self.y_begin = event.Position[1] - 20
-        self.y_end = event.Position[1] + 20
-        image = get_screenshot(self.x_begin,
-                               self.y_begin,
-                               self.x_end - self.x_begin,
-                               self.y_end - self.y_begin)  # x,y,w,h
-        text = pytesseract.image_to_string(
-            image=image,
-            lang="digits",
-            config="--psm 6 --oem 3 -c tessedit_char_whitelist=.0123456789")
-
-        self.message_text.Label = "识别区：" + str(event.Position) + " " + text
-        self.Iconize(False)
-        self.Show(True)
-        return True
-
     def action(self):
         while True:
             if self.press_the_trigger_button and not self.isPause:
@@ -354,14 +369,13 @@ class MainWindow(wx.Frame):
         hm = PyHook3.HookManager()
         hm.KeyDown = self.onKeyDown
         hm.KeyUp = self.onKeyUp
-        hm.MouseMiddleDown = self.MouseMiddleDown
         hm.HookKeyboard()
-        hm.HookMouse()
         pythoncom.PumpMessages()
 
     def listenerAttackSpeed(self, ):
         # 新线程识别攻速，防止因为识别耗时阻塞走A线程
         while True:
+            time.sleep(0.01)
             speed = getAttackSpeed(x_begin=self.x_begin, y_begin=self.y_begin, x_end=self.x_end, y_end=self.y_end)
             if speed is None:
                 # print("未识别到攻速")
