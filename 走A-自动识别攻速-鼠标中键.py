@@ -1,19 +1,14 @@
-import re
 import threading
 import time
 from ctypes import POINTER, c_ulong, Structure, c_ushort, c_short, c_long, byref, windll, pointer, sizeof, Union
-
-import PyHook3
-import pytesseract
-import pythoncom
-import win32con
-import win32gui
 import wx
 from PIL import Image
 
 
 def get_screenshot(left, top, width, height):
     import win32ui
+    import win32con
+    import win32gui
     # 获取桌面截图
     hdesktop = win32gui.GetDesktopWindow()
     # 分辨率适应
@@ -48,6 +43,8 @@ def get_screenshot(left, top, width, height):
 
 # <editor-fold desc="图片识别攻速部分">
 def getAttackSpeed(x_begin=385, y_begin=1010, x_end=433, y_end=1036):
+    import pytesseract
+    import re
     image = get_screenshot(x_begin, y_begin, x_end - x_begin, y_end - y_begin)  # x,y,w,h
     text = pytesseract.image_to_string(
         image=image,
@@ -309,6 +306,7 @@ class MainWindow(wx.Frame):
         return True
 
     def update_gs(self, event):
+        import pytesseract
         print(threading.current_thread().name, event.Message)
         self.x_begin = event.Position[0] - 30
         self.x_end = event.Position[0] + 30
@@ -356,6 +354,8 @@ class MainWindow(wx.Frame):
             time.sleep(click_time)
 
     def key_listener(self, ):
+        import PyHook3
+        import pythoncom
         hm = PyHook3.HookManager()
         hm.KeyDown = self.onKeyDown
         hm.KeyUp = self.onKeyUp
