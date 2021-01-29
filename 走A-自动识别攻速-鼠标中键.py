@@ -50,6 +50,7 @@ def getAttackSpeed(x_begin=385, y_begin=1010, x_end=433, y_end=1036):
         image=image,
         lang="digits",
         config="--psm 6 --oem 3 -c tessedit_char_whitelist=.0123456789")
+    image.close()
     # 筛选出识别出的一堆数据中的小数
     matchObj = re.search(r'[0-5]\.[0-9]{1,2}', text)
     if matchObj:
@@ -301,13 +302,11 @@ class MainWindow(wx.Frame):
         return True
 
     def MouseMiddleDown(self, event):
-        if event.Message == 519:
-            threading.Thread(target=self.update_gs, args=[event]).start()
+        self.update_gs(event)
         return True
 
     def update_gs(self, event):
         import pytesseract
-        print(threading.current_thread().name, event.Message)
         self.x_begin = event.Position[0] - 30
         self.x_end = event.Position[0] + 30
         self.y_begin = event.Position[1] - 20
@@ -320,7 +319,7 @@ class MainWindow(wx.Frame):
             image=image,
             lang="digits",
             config="--psm 6 --oem 3 -c tessedit_char_whitelist=.0123456789")
-
+        image.close()
         wx.MessageBox("识别区已经更新成功！\n"
                       "当前区域：" + str(event.Position) +
                       "\n当前识别到的文字：" + text, '更新识别区域')
@@ -367,13 +366,15 @@ class MainWindow(wx.Frame):
     def listenerAttackSpeed(self, ):
         # 新线程识别攻速，防止因为识别耗时阻塞走A线程
         while True:
-            time.sleep(0.01)
+            time.sleep(0.05)
             speed = getAttackSpeed(x_begin=self.x_begin, y_begin=self.y_begin, x_end=self.x_end, y_end=self.y_end)
             if speed is None:
                 # print("未识别到攻速")
                 continue
             # print("识别到攻速为：" + str(speed))
             if speed <= 0 or speed >= 6.0:
+                continue
+            if self.GongSu == speed:
                 continue
             self.GongSu = speed
             self.dc = 1.0 / self.GongSu
