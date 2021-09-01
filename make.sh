@@ -1,19 +1,43 @@
 rm -rf __pycache__
 rm -rf build
-rm -rf dist
 rm -rf *.spec
-pyinstaller -F --uac-admin -w 丝滑走A_通用.py -i icon.ico
-pyinstaller -F --uac-admin 卡牌大师秒切助手.py -i icon.ico
-pyinstaller -F --uac-admin 武器光速摸眼.py -i icon.ico
-pyinstaller -F --uac-admin 盲僧光速摸眼.py -i icon.ico
-pyinstaller -F --uac-admin -w 丝滑走A_寒冰自动Q.py -i icon.ico
-pyinstaller -F --uac-admin -w 丝滑走A_大嘴自动W.py -i icon.ico
-pyinstaller -F --uac-admin -w 丝滑走A_天使自动E.py -i icon.ico
-pyinstaller -F --uac-admin -w 丝滑走A_老鼠自动R.py -i icon.ico
-pyinstaller -F --uac-admin -w 走A-自动识别攻速-鼠标中键.py -i icon.ico
+rm -rf dist/ZouA/走*
+rm -rf dist/ZouA/卡牌*
+
+pyinstaller -D --uac-admin -w 卡牌大师秒切助手.py -i icon.ico
+pyinstaller -D --uac-admin -w 走A.py -i icon.ico
+pyinstaller -D --uac-admin -w 走A-E.py -i icon.ico
+pyinstaller -D --uac-admin -w 走A-Q.py -i icon.ico
+pyinstaller -D --uac-admin -w 走A-W.py -i icon.ico
+pyinstaller -D --uac-admin -w 武器光速摸眼.py -i icon.ico
+pyinstaller -D --uac-admin -w 盲僧光速摸眼.py -i icon.ico
+
+#cp -rf ZouA dist
+cp -rf dist/卡牌大师秒切助手/卡牌大师秒切助手.exe dist/ZouA
+cp -rf dist/走A/走A.exe dist/ZouA
+cp -rf dist/走A-E/走A-E.exe dist/ZouA
+cp -rf dist/走A-Q/走A-Q.exe dist/ZouA
+cp -rf dist/走A-W/走A-W.exe dist/ZouA
+cp -rf dist/武器光速摸眼/武器光速摸眼.exe dist/ZouA
+cp -rf dist/盲僧光速摸眼/盲僧光速摸眼.exe dist/ZouA
+
+cp -rf dist/卡牌大师秒切助手/卡牌大师秒切助手.exe.manifest dist/ZouA
+cp -rf dist/走A/走A.exe.manifest dist/ZouA
+cp -rf dist/走A-E/走A-E.exe.manifest dist/ZouA
+cp -rf dist/走A-Q/走A-Q.exe.manifest dist/ZouA
+cp -rf dist/走A-W/走A-W.exe.manifest dist/ZouA
+cp -rf dist/武器光速摸眼/武器光速摸眼.exe.manifest dist/ZouA
+cp -rf dist/盲僧光速摸眼/盲僧光速摸眼.exe.manifest dist/ZouA
+
+rm -rf dist/卡牌大师秒切助手
+rm -rf dist/走A
+rm -rf dist/走A-E
+rm -rf dist/走A-Q
+rm -rf dist/走A-W
+rm -rf dist/武器光速摸眼
+rm -rf dist/盲僧光速摸眼
+
 rm -rf __pycache__
 rm -rf build
 rm -rf *.spec
 
-cp -rf icon.ico dist
-cp -rf Tesseract-OCR dist
