@@ -4,13 +4,13 @@ rm -rf *.spec
 rm -rf dist/ZouA/走*
 rm -rf dist/ZouA/卡牌*
 
-pyinstaller -D --uac-admin -w 卡牌大师秒切助手.py -i icon.ico
-pyinstaller -D --uac-admin -w 走A.py -i icon.ico
-pyinstaller -D --uac-admin -w 走A-E.py -i icon.ico
-pyinstaller -D --uac-admin -w 走A-Q.py -i icon.ico
-pyinstaller -D --uac-admin -w 走A-W.py -i icon.ico
-pyinstaller -D --uac-admin -w 武器光速摸眼.py -i icon.ico
-pyinstaller -D --uac-admin -w 盲僧光速摸眼.py -i icon.ico
+#pyinstaller -D --uac-admin -w 卡牌大师秒切助手.py -i icon.ico
+pyinstaller -F --uac-admin -w 走A.py -i icon.ico
+#pyinstaller -D --uac-admin -w 走A-E.py -i icon.ico
+#pyinstaller -D --uac-admin -w 走A-Q.py -i icon.ico
+#pyinstaller -D --uac-admin -w 走A-W.py -i icon.ico
+#pyinstaller -D --uac-admin -w 武器光速摸眼.py -i icon.ico
+#pyinstaller -D --uac-admin -w 盲僧光速摸眼.py -i icon.ico
 
 #cp -rf ZouA dist
 cp -rf dist/卡牌大师秒切助手/卡牌大师秒切助手.exe dist/ZouA

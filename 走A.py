@@ -1,67 +1,28 @@
+import json
 import threading
 import time
 from ctypes import POINTER, c_ulong, Structure, c_ushort, c_short, c_long, byref, windll, pointer, sizeof, Union
 
+import requests
 import wx
-from PIL import Image
+import urllib3
 
-
-def get_screenshot(left, top, width, height):
-    import win32ui
-    import win32con
-    import win32gui
-    # 获取桌面截图
-    hdesktop = win32gui.GetDesktopWindow()
-    # 分辨率适应
-    # width = win32api.GetSystemMetrics(win32con.SM_CXVIRTUALSCREEN)
-    # height = win32api.GetSystemMetrics(win32con.SM_CYVIRTUALSCREEN)
-    # left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
-    # top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
-    # 创建设备描述表
-    desktop_dc = win32gui.GetWindowDC(hdesktop)
-    img_dc = win32ui.CreateDCFromHandle(desktop_dc)
-    # 创建一个内存设备描述表
-    mem_dc = img_dc.CreateCompatibleDC()
-    # 创建位图对象
-    screenshot = win32ui.CreateBitmap()
-    screenshot.CreateCompatibleBitmap(img_dc, width, height)
-    mem_dc.SelectObject(screenshot)
-    # 截图至内存设备描述表
-    mem_dc.BitBlt((0, 0), (width, height), img_dc, (left, top), win32con.SRCCOPY)
-    # 将截图保存到文件中
-    # screenshot.SaveBitmapFile(mem_dc, 'screenshot.bmp')
-    # 转成Image
-    bmparray = screenshot.GetBitmapBits(True)
-    bmpinfo = screenshot.GetInfo()
-    # RGB 是彩色，L 是灰色
-    pil_im = Image.frombuffer('RGB', (bmpinfo['bmWidth'], bmpinfo['bmHeight']),
-                              bmparray, 'raw', 'BGRX', 0, 1).convert("L")
-    # 内存释放
-    mem_dc.DeleteDC()
-    win32gui.DeleteObject(screenshot.GetHandle())
-    return pil_im
-
-
+urllib3.disable_warnings()
+zhilianUrl = "https://127.0.0.1:2999/liveclientdata/activeplayer"
 # <editor-fold desc="图片识别攻速部分">
 def getAttackSpeed(x_begin=385, y_begin=1010, x_end=433, y_end=1036):
-    import pytesseract
-    import re
-    image = get_screenshot(x_begin, y_begin, x_end - x_begin, y_end - y_begin)  # x,y,w,h
-    text = pytesseract.image_to_string(
-        image=image,
-        lang="digits",
-        config="--psm 6 --oem 3 -c tessedit_char_whitelist=.0123456789")
-    image.close()
-    # 筛选出识别出的一堆数据中的小数
-    matchObj = re.search(r'[0-5]\.[0-9]{1,2}', text)
-    if matchObj:
-        test = matchObj.group(0)
-        if len(test) >= 3:
-            if test[0:3] == "0.1":
-                test = "0.7" + test[3:]
-            if test[0:1] == "7":
-                test = "1" + test[1:]
-            return float(test)
+    # https://127.0.0.1:2999/liveclientdata/activeplayer
+    # activePlayer.championStats.attackSpeed
+    try:
+        r = requests.get(zhilianUrl, verify=False)
+        if r.ok:
+            lolJson = r.text
+            data = json.loads(lolJson)
+            return float(data["championStats"]["attackSpeed"])
+        else:
+            return None
+    except:
+        return None
 
 
 # </editor-fold>
@@ -216,7 +177,7 @@ class MainWindow(wx.Frame):
     onlyLoL = True
     currentKey = "Capital"
     GongSu = 1.7
-    QianYao = 0.45
+    QianYao = 0.35
     YDBC = 0.0
     dc = 1.0 / GongSu
     qy = dc * QianYao
@@ -235,26 +196,6 @@ class MainWindow(wx.Frame):
             if self.onlyLoL and not self.isPause:
                 # 按下 C 显示攻击距离,并且仅选中英雄
                 sendkey(0x2e, 1)
-            return self.isPause
-        elif event.Key == "Volume_Down":
-            self.update_number(self.text_num1, False, 0.6, 3.0, 0.01)
-            self.Iconize(False)
-            self.Show(True)
-            return self.isPause
-        elif event.Key == "Volume_Up":
-            self.update_number(self.text_num1, True, 0.6, 3.0, 0.01)
-            self.Iconize(False)
-            self.Show(True)
-            return self.isPause
-        elif event.Key == "Up":
-            self.update_number(self.text_num1, True, 0.6, 3.0, 0.1)
-            self.Iconize(False)
-            self.Show(True)
-            return self.isPause
-        elif event.Key == "Down":
-            self.update_number(self.text_num1, False, 0.6, 3.0, 0.1)
-            self.Iconize(False)
-            self.Show(True)
             return self.isPause
         elif event.Key == "Right":
             self.update_number(self.text_num2, True, 0, 1, 0.01)
@@ -302,29 +243,6 @@ class MainWindow(wx.Frame):
             return self.isPause
         return True
 
-    def MouseMiddleDown(self, event):
-        self.update_gs(event)
-        return True
-
-    def update_gs(self, event):
-        import pytesseract
-        self.x_begin = event.Position[0] - 30
-        self.x_end = event.Position[0] + 30
-        self.y_begin = event.Position[1] - 20
-        self.y_end = event.Position[1] + 20
-        image = get_screenshot(self.x_begin,
-                               self.y_begin,
-                               self.x_end - self.x_begin,
-                               self.y_end - self.y_begin)  # x,y,w,h
-        text = pytesseract.image_to_string(
-            image=image,
-            lang="digits",
-            config="--psm 6 --oem 3 -c tessedit_char_whitelist=.0123456789")
-        image.close()
-        wx.MessageBox("识别区已经更新成功！\n"
-                      "当前区域：" + str(event.Position) +
-                      "\n当前识别到的文字：" + text, '更新识别区域')
-
     def action(self):
         while True:
             if self.press_the_trigger_button and not self.isPause:
@@ -334,8 +252,8 @@ class MainWindow(wx.Frame):
                 self.click(0x2c, self.qy)
                 self.click(0x2d, self.hy)
                 ys = time.time() - process_time - self.dc - self.YDBC
-                self.message_text.Label = (str(round(self.dc, 3)) + 'A/' + str(round(self.qy, 3)) + 'Z/' +
-                                           str(round(self.hy, 3)) + 'X/' + str(round(ys, 3)))
+                # self.message_text.Label = (str(round(self.dc, 3)) + 'A/' + str(round(self.qy, 3)) + 'Z/' +
+                #                            str(round(self.hy, 3)) + 'X/' + str(round(ys, 3)))
             else:
                 time.sleep(0.01)
 
@@ -359,7 +277,6 @@ class MainWindow(wx.Frame):
         hm = PyHook3.HookManager()
         hm.KeyDown = self.onKeyDown
         hm.KeyUp = self.onKeyUp
-        hm.MouseMiddleDown = self.MouseMiddleDown
         hm.HookKeyboard()
         hm.HookMouse()
         pythoncom.PumpMessages()
@@ -367,12 +284,10 @@ class MainWindow(wx.Frame):
     def listenerAttackSpeed(self, ):
         # 新线程识别攻速，防止因为识别耗时阻塞走A线程
         while True:
-            time.sleep(1)
+            # time.sleep(0.01)
             speed = getAttackSpeed(x_begin=self.x_begin, y_begin=self.y_begin, x_end=self.x_end, y_end=self.y_end)
             if speed is None:
-                # print("未识别到攻速")
                 continue
-            # print("识别到攻速为：" + str(speed))
             if speed <= 0 or speed >= 6.0:
                 continue
             if self.GongSu == speed:
@@ -381,7 +296,6 @@ class MainWindow(wx.Frame):
             self.dc = 1.0 / self.GongSu
             self.qy = self.dc * self.QianYao
             self.hy = self.dc - self.qy + self.YDBC
-            self.text_num1.SetLabel(str(speed))
 
     def OnClose(self, event):
         # self.taskBarIcon.Destroy()
@@ -401,26 +315,11 @@ class MainWindow(wx.Frame):
         self.start_setting = False
 
         self.sizer = wx.BoxSizer(wx.VERTICAL)
-        self.sizer1 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer2 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer3 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer4 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer5 = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.text1 = wx.StaticText(self, name="aa", label="攻速", size=(40, -1), style=wx.ALIGN_CENTER)
-        self.text_num1 = wx.StaticText(self, name="aa", label=str(self.GongSu), size=(60, -1), style=wx.ALIGN_CENTER)
-        self.text1.SetFont(wx.Font(12, wx.SWISS, wx.NORMAL, wx.NORMAL))
-        self.text_num1.SetFont(wx.Font(20, wx.SWISS, wx.NORMAL, wx.FONTWEIGHT_BOLD))
-        self.text1.SetForegroundColour('#000000')
-        self.text_num1.SetForegroundColour('#FF0000')
-        self.button_up1 = wx.Button(self, name="up1", label="↑", size=(30, 30))
-        self.button_down1 = wx.Button(self, name="down1", label="↓", size=(30, 30))
-        self.Bind(wx.EVT_BUTTON, self.onClick, self.button_up1)
-        self.Bind(wx.EVT_BUTTON, self.onClick, self.button_down1)
-        self.sizer1.Add(self.text1, flag=wx.ALIGN_CENTER)
-        self.sizer1.Add(self.text_num1, flag=wx.ALIGN_CENTER)
-        self.sizer1.Add(self.button_down1, flag=wx.ALIGN_CENTER)
-        self.sizer1.Add(self.button_up1, flag=wx.ALIGN_CENTER)
 
         self.text2 = wx.StaticText(self, name="aa", label="前摇", size=(40, -1), style=wx.ALIGN_CENTER)
         self.text_num2 = wx.StaticText(self, name="aa", label=str(self.QianYao), size=(60, -1), style=wx.ALIGN_CENTER)
@@ -462,11 +361,11 @@ class MainWindow(wx.Frame):
         self.sizer4.Add(self.button_stop, flag=wx.ALIGN_CENTER)
         self.sizer4.Add(self.button_setting, flag=wx.ALIGN_CENTER)
 
-        self.message_text = wx.StaticText(self, name="aa", label="已启动,按住[" + self.currentKey + "]走A")
+        self.message_text = wx.StaticText(self, name="aa", label="已启动,按住[" + self.currentKey + "]走A\n进入游戏后自动获取攻速")
         self.message_text.SetForegroundColour('#000000')
         self.sizer5.Add(self.message_text)
 
-        self.sizer.Add(self.sizer1)
+        # self.sizer.Add(self.sizer1)
         self.sizer.Add(self.sizer2)
         self.sizer.Add(self.sizer3)
         self.sizer.Add(self.sizer4)
@@ -481,7 +380,7 @@ class MainWindow(wx.Frame):
         self.thread_listenerAttackSpeed.daemon = True
         self.thread_key.daemon = True
         self.thread_action.daemon = True
-        # self.thread_listenerAttackSpeed.start()
+        self.thread_listenerAttackSpeed.start()
         self.thread_key.start()
         self.thread_action.start()
 
@@ -524,9 +423,7 @@ class MainWindow(wx.Frame):
             num = min
         if num > max:
             num = max
-        if who == self.text_num1:
-            self.GongSu = num
-        elif who == self.text_num2:
+        if who == self.text_num2:
             self.QianYao = num
         elif who == self.text_num3:
             self.YDBC = num

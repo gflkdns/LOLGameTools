@@ -1,3 +1,7 @@
+> 2022年1月11日 解决卡顿的问题，攻速改由LOL官方api获取，更加准确，实时。
+> 2021年1月26日 更新自动获取攻速支持 | 感谢 [ztgreenleaves](https://github.com/ztgreenleaves) 提供自动获取攻速的功能！
+
+
 本程序是LOL走A刷兵辅助程序，非恶意躲技能外挂，献给因工作后渐渐提不动刀的老玩家，为LOL续一秒。
 
 使用模拟按键的方式，所以不用担心封号。
@@ -38,6 +42,4 @@
 下载：链接：https://pan.baidu.com/s/1RskJBzROhrzas9nBOqd7XQ 提取码：0000     
 加群搞事情：qq：209622340
 
-
-> 2021年1月26日 更新自动获取攻速支持 | 感谢 [ztgreenleaves](https://github.com/ztgreenleaves) 提供自动获取攻速的功能！
 
