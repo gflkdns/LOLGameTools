@@ -284,7 +284,7 @@ class MainWindow(wx.Frame):
     def listenerAttackSpeed(self, ):
         # 新线程识别攻速，防止因为识别耗时阻塞走A线程
         while True:
-            # time.sleep(0.01)
+            time.sleep(0.3)
             speed = getAttackSpeed(x_begin=self.x_begin, y_begin=self.y_begin, x_end=self.x_end, y_end=self.y_end)
             if speed is None:
                 continue
