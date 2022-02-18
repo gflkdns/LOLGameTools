@@ -9,8 +9,11 @@ import urllib3
 
 urllib3.disable_warnings()
 zhilianUrl = "https://127.0.0.1:2999/liveclientdata/activeplayer"
+# zhilianUrl = "http://localhost/E%3A/test.txt"
+
+
 # <editor-fold desc="图片识别攻速部分">
-def getAttackSpeed(x_begin=385, y_begin=1010, x_end=433, y_end=1036):
+def getAttackSpeed():
     # https://127.0.0.1:2999/liveclientdata/activeplayer
     # activePlayer.championStats.attackSpeed
     try:
@@ -18,7 +21,9 @@ def getAttackSpeed(x_begin=385, y_begin=1010, x_end=433, y_end=1036):
         if r.ok:
             lolJson = r.text
             data = json.loads(lolJson)
-            return float(data["championStats"]["attackSpeed"])
+            res = float(data["championStats"]["attackSpeed"])
+            r.close()
+            return res
         else:
             return None
     except:
@@ -129,7 +134,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
     def __init__(self, frame):
         wx.adv.TaskBarIcon.__init__(self)
         self.frame = frame
-        self.SetIcon(wx.Icon(name='icon.ico'), '走A吧少年！')  # wx.ico为ico图标文件
+        self.SetIcon(wx.Icon(name='icon.ico'), '摇头怪上线！')  # wx.ico为ico图标文件
         self.Bind(wx.adv.EVT_TASKBAR_LEFT_DOWN, self.OnTaskBarLeftDClick)
         self.Bind(wx.EVT_MENU, self.OnAbout, id=self.ID_About)
         self.Bind(wx.EVT_MENU, self.OnClose, id=self.ID_Close)
@@ -150,7 +155,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
                       "最好把窗口设置为无边框模式或者窗口模式\n"
                       "最好再设置下优先攻击鼠标最近的单位，这样就可以鼠标指哪打那\n"
                       "按键说明：\n"
-                      "CapsLock - 触发走A\n"
+                      "长按CapsLock - 触发走A\n"
                       "上下左右 - 调整参数\n"
                       "Esc - 最小化到托盘区\n"
                       "鼠标中间滚轮按下 - 设置攻速识别位置"
@@ -176,17 +181,12 @@ class MainWindow(wx.Frame):
     minTime = 0.1
     onlyLoL = True
     currentKey = "Capital"
-    GongSu = 1.7
+    GongSu = 0.7
     QianYao = 0.35
     YDBC = 0.0
     dc = 1.0 / GongSu
     qy = dc * QianYao
     hy = dc - qy + YDBC
-
-    x_begin = 528 - 142
-    y_begin = 1069 - 63
-    x_end = 528
-    y_end = 1069
 
     press_the_trigger_button = False
 
@@ -246,14 +246,10 @@ class MainWindow(wx.Frame):
     def action(self):
         while True:
             if self.press_the_trigger_button and not self.isPause:
-                process_time = time.time()
                 # 天使前置按 E 10 (Q), 11 (W), 12 (E), 13 (R)
                 # self.click(0x10, 0)
                 self.click(0x2c, self.qy)
                 self.click(0x2d, self.hy)
-                ys = time.time() - process_time - self.dc - self.YDBC
-                # self.message_text.Label = (str(round(self.dc, 3)) + 'A/' + str(round(self.qy, 3)) + 'Z/' +
-                #                            str(round(self.hy, 3)) + 'X/' + str(round(ys, 3)))
             else:
                 time.sleep(0.01)
 
@@ -284,11 +280,12 @@ class MainWindow(wx.Frame):
     def listenerAttackSpeed(self, ):
         # 新线程识别攻速，防止因为识别耗时阻塞走A线程
         while True:
-            time.sleep(0.3)
-            speed = getAttackSpeed(x_begin=self.x_begin, y_begin=self.y_begin, x_end=self.x_end, y_end=self.y_end)
+            time.sleep(0.2)
+            speed = getAttackSpeed()
+            # print(speed)
             if speed is None:
                 continue
-            if speed <= 0 or speed >= 6.0:
+            if speed <= 0:
                 continue
             if self.GongSu == speed:
                 continue
@@ -319,7 +316,6 @@ class MainWindow(wx.Frame):
         self.sizer3 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer4 = wx.BoxSizer(wx.HORIZONTAL)
         self.sizer5 = wx.BoxSizer(wx.HORIZONTAL)
-
 
         self.text2 = wx.StaticText(self, name="aa", label="前摇", size=(40, -1), style=wx.ALIGN_CENTER)
         self.text_num2 = wx.StaticText(self, name="aa", label=str(self.QianYao), size=(60, -1), style=wx.ALIGN_CENTER)
