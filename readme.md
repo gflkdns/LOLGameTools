@@ -37,7 +37,7 @@
 - page up:呼出软件并开始走A触发
 - page down:呼出软件并暂停走A触发
 
-下载：链接：https://pan.baidu.com/s/1RskJBzROhrzas9nBOqd7XQ 提取码：0000     
+下载：https://github.com/miqt/LOLGameTools/releases   
 加群搞事情：qq：209622340
 
 
